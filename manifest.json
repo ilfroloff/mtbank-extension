@@ -1,0 +1,32 @@
+{
+    "manifest_version": 2,
+    "name": "МТБанк Дополнение",
+    "version": "1.2",
+    "applications": {
+        "gecko": {
+            "id": "mtbank@ilfroloff.my"
+        }
+    },
+
+    "description": "Расширение стандартных возможностей МТБанк",
+
+    "browser_action": {
+        "default_icon": "icon.png",
+        "default_title": "МТБанкинг"
+    },
+
+    "content_scripts": [
+        {
+            "matches": [
+                "https://new.mybank.by/ib/site/dashboard/v2*"
+            ],
+            "js": [
+                "mtbank.js"
+            ]
+        }
+    ],
+
+    "permissions": [
+        "activeTab"
+    ]
+}
