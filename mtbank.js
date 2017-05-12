@@ -112,74 +112,81 @@ function fill_rate(card_box, rate_data) {
 }
 
 /**
- * Table of BYN and EUR/USD conversions
  *
- * @type {NodeList}
  */
-var conversation_table = document.querySelectorAll('.conversion-table tr td');
+function initializeCurrencies() {
+    /**
+     * Table of BYN and EUR/USD conversions
+     *
+     * @type {NodeList}
+     */
+    var conversation_table = document.querySelectorAll('.conversion-table tr td');
 
-/**
- *
- * @type {Object.<string, Rate>}
- */
-var rates = {};
-var items = destructure(conversation_table);
+    /**
+     *
+     * @type {Object.<string, Rate>}
+     */
+    var rates = {};
+    var items = destructure(conversation_table);
 
-for(var i = 0; i < items.length; i += 3) {
-    var name = items[i].textContent;
+    for(var i = 0; i < items.length; i += 3) {
+        var name = items[i].textContent;
 
-    var rate_buy = items[i + 1];
-    var rate_cell = items[i + 2];
+        var rate_buy = items[i + 1];
+        var rate_cell = items[i + 2];
 
-    rates[name] = {
-        currency: name,
-        buy: toNumber(rate_buy.textContent),
-        cell: toNumber(rate_cell.textContent)
-    };
+        rates[name] = {
+            currency: name,
+            buy: toNumber(rate_buy.textContent),
+            cell: toNumber(rate_cell.textContent)
+        };
+    }
+
+    /**
+     * Cards, deposits etc
+     *
+     * @type {NodeList}
+     */
+    var product_boxes = document.querySelectorAll('.product-body');
+
+    destructure(product_boxes).forEach(function(card_box) {
+        var currency = card_box.querySelector('.currency').textContent;
+
+        switch (currency) {
+            case 'BYN':
+                fill_rate(card_box, rates.USD);
+                fill_rate(card_box, rates.EUR);
+                break;
+
+            case 'USD':
+                fill_rate(card_box, {
+                    currency: 'BYN',
+                    buy: 1 / rates.USD.cell,
+                    cell: 1 / rates.USD.buy
+                });
+
+                fill_rate(card_box, {
+                    currency: 'EUR',
+                    buy: rates["EUR/USD"].cell,
+                    cell: rates["EUR/USD"].buy
+                });
+                break;
+
+            case 'EUR':
+                fill_rate(card_box, {
+                    currency: 'BYN',
+                    buy: 1 / rates.EUR.cell,
+                    cell: 1 / rates.EUR.buy
+                });
+
+                fill_rate(card_box, {
+                    currency: 'USD',
+                    buy: rates["EUR/USD"].buy,
+                    cell: rates["EUR/USD"].cell
+                });
+                break;
+        }
+    });
 }
 
-/**
- * Cards, deposits etc
- *
- * @type {NodeList}
- */
-var product_boxes = document.querySelectorAll('.product-body');
-
-destructure(product_boxes).forEach(function(card_box) {
-    var currency = card_box.querySelector('.currency').textContent;
-
-    switch (currency) {
-        case 'BYN':
-            fill_rate(card_box, rates.USD);
-            fill_rate(card_box, rates.EUR);
-            break;
-
-        case 'USD':
-            fill_rate(card_box, {
-                currency: 'BYN',
-                buy: 1 / rates.USD.cell,
-                cell: 1 / rates.USD.buy
-            });
-
-            fill_rate(card_box, {
-                currency: 'EUR',
-                buy: rates["EUR/USD"].cell,
-                cell: rates["EUR/USD"].buy
-            });
-            break;
-
-        case 'EUR':
-            fill_rate(card_box, {
-                currency: 'BYN',
-                buy: 1 / rates.EUR.cell,
-                cell: 1 / rates.EUR.buy
-            });
-
-            fill_rate(card_box, {
-                currency: 'USD',
-                buy: rates["EUR/USD"].buy,
-                cell: rates["EUR/USD"].cell
-            });
-            break;
-    }
-});
+document.addEventListener("DOMContentLoaded", initializeCurrencies);
