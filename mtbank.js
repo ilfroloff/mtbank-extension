@@ -189,4 +189,8 @@ function initializeCurrencies() {
     });
 }
 
-document.addEventListener("DOMContentLoaded", initializeCurrencies);
+if (document.querySelector('#products-content')) {
+    initializeCurrencies();
+} else {
+    document.addEventListener("DOMContentLoaded", initializeCurrencies);
+}
